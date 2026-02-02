@@ -1,4 +1,3 @@
-###kinship
 setwd("D:/gs2/10.16")
 myY=read.table("AP.txt", head = TRUE)  
 myY_hb  <- read.table("hb.txt",  head = TRUE, stringsAsFactors = FALSE)[,1:4]
@@ -118,7 +117,6 @@ for(trait in traits){
       blink_sig_snps  <- character(0)
 }
 
-    cat("BLINK显著位点个数为:", blink_sig_count, "\n")
     if (length(blink_sig_snps) > 0) {
     myGD_sig_df <- data.frame(Taxa = myGD$Taxa, myGD[, blink_sig_snps, drop=FALSE])
     myCV3 <- merge(myCV1, myGD_sig_df, by = "Taxa", all.x = TRUE)
@@ -169,16 +167,14 @@ for(trait in traits){
       gwas_qy  <- run_gwas(train_qy)
       gwas_hlj <- run_gwas(train_hlj)
 
-      # ======= 写入 METAL 输入文件 =======
       fn_hb  <- paste0("hb_rep", i, "_fold", j, ".txt")
       fn_qy  <- paste0("qy_rep", i, "_fold", j, ".txt")
       fn_hlj <- paste0("hlj_rep", i, "_fold", j, ".txt")
 
       write.table(gwas_hb[,c("SNP","effect","P.value","nobs")],  fn_hb,  sep="\t", row.names=FALSE, quote=FALSE)
       write.table(gwas_qy[,c("SNP","effect","P.value","nobs")],  fn_qy,  sep="\t", row.names=FALSE, quote=FALSE)
-      write.table(gwas_hlj[,c("SNP","effect","P.value","nobs")], fn_hlj, sep="\t", row.names=FALSE, quote=FALSE)
-      
-      # ======= 写 METAL 脚本 =======
+      write.table(gwas_hlj[,c("SNP","effect","P.value","nobs")], fn_hlj, sep="\t", row.names=FALSE, quote=FALSE)  
+
       metal_script <- paste0("metal_rep", i, "_fold", j, ".txt")
       meta_out <- paste0("meta_rep", i, "_fold", j)
 
@@ -238,16 +234,9 @@ for(trait in traits){
     pred_store_blink[, c("Taxa","Phenotype","BLUE.N","gBreedingValue","method")],
     pred_store_meta[,  c("Taxa","Phenotype","BLUE.N","gBreedingValue","method")]
   )
-  
-  write.csv(pred_both, out_file, row.names = FALSE)
-  cat("✅ 已保存前 1..100 折的预测结果到文件：", out_file, "\n")
-}
-						   
+  				   
       cor_pred_meta <- cor(merged_meta$Phenotype, merged_meta$BLUE.N)
       cor_gBV_meta  <- cor(merged_meta$Phenotype, merged_meta$gBreedingValue)
-      
-	  cor_pred_meta 
-	  cor_gBV_meta
 	  
       results_all <- rbind(results_all,
                            data.frame(trait=trait, rep=i, fold=j, method="Meta",
@@ -266,22 +255,3 @@ for(trait in traits){
 
 if (!dir.exists("D:/gs results")) dir.create("D:/gs results", recursive = TRUE)
 write.csv(results_all, "D:/gs results/6.0DP_blink_vs_meta(kinship).csv", row.names = FALSE)
-
-##检查
-setdiff(train_all$Taxa, myGD$Taxa)
-setdiff(myY$Taxa, myGD$Taxa)
-setdiff(myGD$Taxa, myY$Taxa) ##完全匹配
-
-
-data<- read.csv("100kinship_gs.csv", head = TRUE)
-data_blink <- subset(data, method == "BLINK")
-dim(data_blink)
-head(data_blink)
-cor_pred_blink <- cor(data_blink$Phenotype, merged_blink$BLUE.N)
-cor_gBV_blink <- cor(data_blink$Phenotype, merged_blink$gBreedingValue)
-
-data_meta <- subset(data, method == "META")
-dim(data_meta)
-head(data_meta)
-cor_pred_meta <- cor(data_blink$Phenotype, merged_meta$BLUE.N)
-cor_gBV_meta <- cor(data_blink$Phenotype, merged_meta$gBreedingValue)
