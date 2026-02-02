@@ -6,13 +6,14 @@ FREQ     MAF
 EFFECT   Effect
 PVAL     P.Value
 
-PROCESS hb.CW.txt
-PROCESS hlj.CW.txt
-PROCESS qy.CW.txt
+PROCESS hb.txt
+PROCESS hlj.txt
+PROCESS qy.txt
 
 
 ANALYZE
 
 ANALYZE HETEROGENEITY
+
 
 
